@@ -9,6 +9,10 @@ from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 
+from marker.converters.pdf import PdfConverter
+from marker.models import create_model_dict
+from marker.output import text_from_rendered
+
 # ==========================================
 # CONFIGURAÇÕES
 # ==========================================
@@ -24,6 +28,8 @@ converter_docling = DocumentConverter(
     }
 )
 
+converter_marker = PdfConverter(artifact_dict=create_model_dict())
+
 
 # ==========================================
 # INFORMAÇÕES DO PDF
@@ -38,6 +44,7 @@ print(f"Arquivo: {NOME_ARQUIVO}")
 print(f"Páginas: {len(documento)}")
 print()
 
+documento.close()
 
 # ==========================================
 # PYMUPDF
@@ -136,6 +143,30 @@ def processar_docling():
 
 
 # ==========================================
+# MARKER
+# ==========================================
+
+
+def processar_marker():
+    print("Processando com MARKER...")
+
+    inicio = time.perf_counter()
+
+    resultado = converter_marker(NOME_ARQUIVO)
+
+    markdown, _, _ = text_from_rendered(resultado)
+
+    fim = time.perf_counter()
+
+    Path("resultados/marker.md").write_text(markdown, encoding="utf-8")
+
+    print(f"⏱️ Tempo: {fim - inicio:.4f} segundos")
+    print(f"📄 Caracteres markdown: {len(markdown):,}")
+    print("💾 Resultado: resultados/marker.md")
+    print()
+
+
+# ==========================================
 # EXECUÇÃO
 # ==========================================
 
@@ -146,6 +177,8 @@ processar_pymupdf()
 processar_pymupdf4llm()
 
 processar_docling()
+
+processar_marker()
 
 fim_total = time.perf_counter()
 

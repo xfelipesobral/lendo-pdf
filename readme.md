@@ -1,14 +1,18 @@
 # Bibliotecas usadas no teste:
 
 docling 2.134.0
+
 pymupdf 1.28.2
+
 pymupdf4llm 1.28.2
+
+marker-pdf 2.0.0
 
 ## Baixar modelos do docling antes
 
 docling-tools models download --all -o ./modelos-docling
 
-# Usando o `.venv`
+## Usando o `.venv`
 
 ```bash
 python3 -m venv .venv
@@ -61,6 +65,7 @@ BENCHMARK FINALIZADO
 ============================================================
 ⏱️ Tempo total: 45.2922 segundos
 ```
+
 ```text
 ============================================================
 INFORMAÇÕES DO PDF ESCANEADO
@@ -169,6 +174,7 @@ BENCHMARK FINALIZADO
 ============================================================
 ⏱️ Tempo total: 162.8985 segundos
 ```
+
 ```text
 ============================================================
 INFORMAÇÕES DO PDF
@@ -177,7 +183,7 @@ Arquivo: pdfs/teste4.pdf
 Páginas: 2
 
 Processando com PYMUPDF...
-⏱️ Tempo: 0.0168 segundos
+⏱️ Tempo: 0.0104 segundos
 📄 Caracteres: 4,240
 💾 Resultado: resultado_pymupdf.txt
 
@@ -189,21 +195,27 @@ Using RapidOCR for OCR processing.
 
 === Document parser messages ===
 Using RapidOCR for OCR processing.
-📄 Caracteres markdown: 2,582; ⏱️ Tempo: 0.8401 segundos
-📄 Caracteres texto: 3,737; ⏱️ Tempo: 0.6312 segundos 🏆
+📄 Caracteres markdown: 2,582; ⏱️ Tempo: 0.8094 segundos
+📄 Caracteres texto: 3,737; ⏱️ Tempo: 0.6643 segundos 🏆
 💾 Resultado: resultado_pymupdf4llm.md
 
 Processando com DOCLING...
-Loading weights: 100%|█████████████████████████████████████████████████████| 770/770 [00:00<00:00, 12214.65it/s]
+Loading weights: 100%|█████████████████| 770/770 [00:00<00:00, 21789.62it/s]
 RapidOCR returned empty result!
 RapidOCR returned empty result!
-⏱️ Tempo: 6.5338 segundos
+⏱️ Tempo: 5.3830 segundos
 📄 Caracteres markdown: 2,734
 📄 Caracteres texto: 2,696
 💾 Resultado: resultado_docling.md
 
+Processando com MARKER...
+2026-10-06 11:01:47,787 [INFO] marker: Table processing stats: {'tables_pdftext': 1, 'tables_total': 1}
+⏱️ Tempo: 26.5527 segundos
+📄 Caracteres markdown: 2,689
+💾 Resultado: resultados/marker.md
+
 ============================================================
 BENCHMARK FINALIZADO
 ============================================================
-⏱️ Tempo total: 8.0229 segundos
+⏱️ Tempo total: 33.4229 segundos
 ```
