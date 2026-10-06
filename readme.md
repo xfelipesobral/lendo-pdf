@@ -1,221 +1,109 @@
-# Bibliotecas usadas no teste:
+# Estudo de caso: leitura de PDFs
 
-docling 2.134.0
+Comparação de bibliotecas de extração de PDF e de duas formas de decidir qual resultado usar: uma heurística de complexidade por página e um juiz (JEV) que compara duas extrações em Markdown.
 
-pymupdf 1.28.2
+Os PDFs de entrada ficam em `pdfs/`. Os textos extraídos vão para `resultados/`. O caminho do arquivo está em `NOME_ARQUIVO` no topo de cada script.
 
-pymupdf4llm 1.28.2
+## Scripts
 
-marker-pdf 2.0.0
+| Script | O que faz |
+| --- | --- |
+| `leitor.py` | Extrai o mesmo PDF com cada biblioteca e grava tempo, tamanho e o texto em `resultados/`. |
+| `pipeline_calculando_complexidade.py` | Mede a complexidade de cada página e sugere qual biblioteca usar. |
+| `pipeline_jev.py` | Extrai com Docling e PyMuPDF4LLM e pede ao JEV para dizer qual parse ficou melhor. |
 
-## Baixar modelos do docling antes
-
-docling-tools models download --all -o ./modelos-docling
-
-## Usando o `.venv`
+## Preparação
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-> 💡 **Como confirmar que deu certo?** O prefixo `(.venv)` aparecerá logo no início da linha de comando do seu terminal, assim: `(.venv) ... %`.
-
-Para sair do ambiente do .venv, use:
+O prefixo `(.venv)` no início da linha do terminal confirma que o ambiente está ativo. Para sair:
 
 ```bash
 deactivate
 ```
 
-# Testes 🏆
+Bibliotecas usadas nos testes:
 
-```text
-============================================================
-INFORMAÇÕES DO PDF
-============================================================
-Arquivo: pdfs/teste.pdf
-Páginas: 13
+```bash
+pip install docling==2.134.0 pymupdf==1.28.2 pymupdf4llm==1.28.2 marker-pdf==2.0.0 "unstructured[pdf]==0.27.16" "unstructured[local-inference]" python-dotenv mdformat
+```
 
-Processando com PYMUPDF...
-⏱️ Tempo: 0.1569 segundos
-📄 Caracteres: 43,928
-💾 Resultado: resultado_pymupdf.txt
+O Docling precisa dos modelos locais antes da primeira execução:
 
-Processando com PYMUPDF4LLM...
-rapidocr_api using backend: rapidocr
+```bash
+docling-tools models download --all -o ./modelos-docling
+```
 
-=== Document parser messages ===
-Using RapidOCR for OCR processing.
+O `pipeline_jev.py` chama a API do OpenRouter. Copie `exemplo.env` para `.env` e preencha a chave:
 
-=== Document parser messages ===
-Using RapidOCR for OCR processing.
-📄 Caracteres markdown: 44,708; ⏱️ Tempo: 1.6726 segundos
-📄 Caracteres texto: 42,224; ⏱️ Tempo: 1.5005 segundos
-💾 Resultado: resultado_pymupdf4llm.md
-
-Processando com DOCLING...
-Loading weights: 100%|█████████████████████████████████████████████████████| 770/770 [00:00<00:00, 11538.33it/s]
-⏱️ Tempo: 41.9609 segundos
-📄 Caracteres markdown: 39,396 🏆
-📄 Caracteres texto: 39,231
-💾 Resultado: resultado_docling.md
-
-============================================================
-BENCHMARK FINALIZADO
-============================================================
-⏱️ Tempo total: 45.2922 segundos
+```bash
+cp exemplo.env .env
 ```
 
 ```text
-============================================================
-INFORMAÇÕES DO PDF ESCANEADO
-============================================================
-Arquivo: pdfs/teste2.pdf
-Páginas: 22
-
-Processando com PYMUPDF...
-⏱️ Tempo: 0.0041 segundos
-📄 Caracteres: 0
-💾 Resultado: resultado_pymupdf.txt
-
-Processando com PYMUPDF4LLM...
-rapidocr_api using backend: rapidocr
-The text detection result is empty
-
-=== Document parser messages ===
-Using RapidOCR for OCR processing.
-OCR on page.number=0/1.
-OCR on page.number=1/2.
-OCR on page.number=2/3.
-OCR on page.number=3/4.
-OCR on page.number=4/5.
-OCR on page.number=5/6.
-OCR on page.number=6/7.
-OCR on page.number=7/8.
-OCR on page.number=8/9.
-OCR on page.number=9/10.
-OCR on page.number=10/11.
-OCR on page.number=11/12.
-OCR on page.number=12/13.
-OCR on page.number=13/14.
-OCR on page.number=14/15.
-OCR on page.number=15/16.
-OCR on page.number=16/17.
-OCR on page.number=17/18.
-OCR on page.number=18/19.
-OCR on page.number=19/20.
-OCR on page.number=20/21.
-OCR on page.number=21/22.
-The text detection result is empty
-
-=== Document parser messages ===
-Using RapidOCR for OCR processing.
-OCR on page.number=0/1.
-OCR on page.number=1/2.
-OCR on page.number=2/3.
-OCR on page.number=3/4.
-OCR on page.number=4/5.
-OCR on page.number=5/6.
-OCR on page.number=6/7.
-OCR on page.number=7/8.
-OCR on page.number=8/9.
-OCR on page.number=9/10.
-OCR on page.number=10/11.
-OCR on page.number=11/12.
-OCR on page.number=12/13.
-OCR on page.number=13/14.
-OCR on page.number=14/15.
-OCR on page.number=15/16.
-OCR on page.number=16/17.
-OCR on page.number=17/18.
-OCR on page.number=18/19.
-OCR on page.number=19/20.
-OCR on page.number=20/21.
-OCR on page.number=21/22.
-📄 Caracteres markdown: 38,214; ⏱️ Tempo: 49.5514 segundos
-📄 Caracteres texto: 38,491; ⏱️ Tempo: 51.3679 segundos 🏆
-💾 Resultado: resultado_pymupdf4llm.md
-
-Processando com DOCLING...
-Loading weights: 100%|█████████████████████████████████████████████████████| 770/770 [00:00<00:00, 13120.25it/s]
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-The text detection result is empty
-RapidOCR returned empty result!
-⏱️ Tempo: 61.9731 segundos
-📄 Caracteres markdown: 38,091
-📄 Caracteres texto: 37,646
-💾 Resultado: resultado_docling.md
-
-============================================================
-BENCHMARK FINALIZADO
-============================================================
-⏱️ Tempo total: 162.8985 segundos
+OPENROUTER_API_KEY=sua_chave_secreta_aqui
 ```
 
-```text
-============================================================
-INFORMAÇÕES DO PDF
-============================================================
-Arquivo: pdfs/teste4.pdf
-Páginas: 2
+## `leitor.py`
 
-Processando com PYMUPDF...
-⏱️ Tempo: 0.0104 segundos
-📄 Caracteres: 4,240
-💾 Resultado: resultado_pymupdf.txt
+Lê o PDF configurado em `NOME_ARQUIVO` e roda, em sequência:
 
-Processando com PYMUPDF4LLM...
-rapidocr_api using backend: rapidocr
+- **PyMuPDF** — texto nativo, página a página, normalizado em NFC. Saída: `resultados/pymupdf.txt`.
+- **PyMuPDF4LLM** — Markdown e texto plano. Saídas: `resultados/pymupdf4llm.md` e `resultados/pymupdf4llm.txt`.
+- **Docling** — usa os modelos em `modelos-docling`. Saídas: `resultados/resultado_docling.md` e `resultados/resultado_docling.txt`.
+- **Marker** — Markdown. Saída: `resultados/marker.md`.
+- **Unstructured** — partição `hi_res` em português, com contagem dos tipos de elemento. Saída: `resultados/unstructured.txt`.
 
-=== Document parser messages ===
-Using RapidOCR for OCR processing.
+```bash
+python leitor.py
+```
 
-=== Document parser messages ===
-Using RapidOCR for OCR processing.
-📄 Caracteres markdown: 2,582; ⏱️ Tempo: 0.8094 segundos
-📄 Caracteres texto: 3,737; ⏱️ Tempo: 0.6643 segundos 🏆
-💾 Resultado: resultado_pymupdf4llm.md
+No fim, o script imprime o tempo total do benchmark.
 
-Processando com DOCLING...
-Loading weights: 100%|█████████████████| 770/770 [00:00<00:00, 21789.62it/s]
-RapidOCR returned empty result!
-RapidOCR returned empty result!
-⏱️ Tempo: 5.3830 segundos
-📄 Caracteres markdown: 2,734
-📄 Caracteres texto: 2,696
-💾 Resultado: resultado_docling.md
+## `pipeline_calculando_complexidade.py`
 
-Processando com MARKER...
-2026-10-06 11:01:47,787 [INFO] marker: Table processing stats: {'tables_pdftext': 1, 'tables_total': 1}
-⏱️ Tempo: 26.5527 segundos
-📄 Caracteres markdown: 2,689
-💾 Resultado: resultados/marker.md
+Abre o PDF com PyMuPDF e, em cada página, calcula um score a partir do layout:
 
-============================================================
-BENCHMARK FINALIZADO
-============================================================
-⏱️ Tempo total: 33.4229 segundos
+| Sinal | Pontos |
+| --- | --- |
+| Tem tabelas | +4 |
+| Tem imagens | +1 |
+| Densidade de texto abaixo de 0,2 | +2 |
+| Mais de 50 blocos | +1 |
+| Sem texto nativo e com imagens | +5 |
+
+A densidade é a área ocupada pelos blocos de texto dividida pela área da página.
+
+A sugestão por página é:
+
+- **6 ou mais** — Docling
+- **3 a 5** — Marker
+- **abaixo de 3** — PyMuPDF4LLM
+
+```bash
+python pipeline_calculando_complexidade.py
+```
+
+## `pipeline_jev.py`
+
+Extrai o mesmo PDF duas vezes, formata os dois Markdowns com `mdformat` e envia ao juiz.
+
+- **Representação A** — Docling (`resultados/resultado_pipeline_jev_a.txt`)
+- **Representação B** — PyMuPDF4LLM (`resultados/resultado_pipeline_jev_b.txt`)
+
+O juiz é o modelo `typesafe/jev-1.13`, via `POST https://openrouter.ai/api/alpha/decisions`. Ele escolhe A ou B em cinco critérios:
+
+- **estrutura** — títulos, seções, listas, tabelas e ordem do conteúdo
+- **legibilidade** — espaçamento, formatação Markdown e clareza
+- **integridade** — caracteres estranhos, palavras quebradas, duplicações e truncamentos
+- **coerência semântica** — rótulos, valores, datas e trechos relacionados permanecem juntos
+- **melhor para LLM** — qual texto serve melhor de contexto para um pipeline de LLM/RAG
+
+A resposta traz a escolha, as probabilidades e a confiança de cada critério. Um registro de execuções está em `resultados_pipeline_jev.md`.
+
+```bash
+python pipeline_jev.py
 ```

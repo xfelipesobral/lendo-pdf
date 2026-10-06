@@ -13,6 +13,8 @@ from marker.converters.pdf import PdfConverter
 from marker.models import create_model_dict
 from marker.output import text_from_rendered
 
+from unstructured.partition.pdf import partition_pdf
+
 # ==========================================
 # CONFIGURAÇÕES
 # ==========================================
@@ -167,6 +169,45 @@ def processar_marker():
 
 
 # ==========================================
+# UNSTRUCTURED
+# ==========================================
+
+
+def processar_unstructured():
+    print("Processando com UNSTRUCTURED...")
+
+    inicio = time.perf_counter()
+
+    elementos = partition_pdf(
+        filename=NOME_ARQUIVO, strategy="hi_res", languages=["por"]
+    )
+
+    fim = time.perf_counter()
+
+    texto = "\n\n".join(elemento.text for elemento in elementos if elemento.text)
+
+    Path("resultados/unstructured.txt").write_text(texto, encoding="utf-8")
+
+    print(f"⏱️ Tempo: {fim - inicio:.4f} segundos")
+    print(f"📄 Elementos: {len(elementos):,}")
+    print(f"📄 Caracteres: {len(texto):,}")
+
+    tipos = {}
+
+    for elemento in elementos:
+        tipo = elemento.category
+        tipos[tipo] = tipos.get(tipo, 0) + 1
+
+    print("📊 Tipos encontrados:")
+
+    for tipo, quantidade in sorted(tipos.items()):
+        print(f"   {tipo}: {quantidade}")
+
+    print("💾 Resultado: resultados/unstructured.txt")
+    print()
+
+
+# ==========================================
 # EXECUÇÃO
 # ==========================================
 
@@ -179,6 +220,8 @@ processar_pymupdf4llm()
 processar_docling()
 
 processar_marker()
+
+processar_unstructured()
 
 fim_total = time.perf_counter()
 
